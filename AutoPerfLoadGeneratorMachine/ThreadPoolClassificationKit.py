@@ -42,7 +42,7 @@ class ThreadPoolClassificationKit:
         profiling_agent_master_obj.initialize(processes_details["process_id"],self.socket_connect_info)
 
 
-        profiling_agent_master_obj.identifyPotentialProcessBottlenecks(test_duration,"noLoad") #Start capturing traces of thread pool at no load 
+        profiling_agent_master_obj.threadPoolClassification(test_duration,"noLoad") #Start capturing traces of thread pool at no load 
 
 
         with open('TaurusSessionDescriptionFile.yaml','r+') as file:
@@ -59,7 +59,7 @@ class ThreadPoolClassificationKit:
         time.sleep(test_duration)
 
 
-        profiling_agent_master_obj.identifyPotentialProcessBottlenecks(test_duration,"Load")  #Start capturing traces of thread pool at load
+        profiling_agent_master_obj.threadPoolClassification(test_duration,"Load")  #Start capturing traces of thread pool at load
 
 
         for proc in psutil.process_iter(['name']):
@@ -69,7 +69,7 @@ class ThreadPoolClassificationKit:
                 proc.kill()
 
         test_start_time=time.time()
-        process_similarity=profiling_agent_master_obj.similarityCheck() #Collect similarity score
+        process_similarity=profiling_agent_master_obj.similarityScore() #Collect similarity score
         test_end_time=time.time()
         print(process_similarity)
         print(test_end_time-test_start_time)
