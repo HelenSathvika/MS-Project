@@ -1,7 +1,7 @@
 import json
 import time
 import connectionSetup
-import setSoftResourceConfiguration
+import SetSoftResourceConfiguration
 import SetCores
 import profiler
 import ThreadPoolClassification
@@ -14,7 +14,7 @@ class main:
     connection_setup.port=server_conf['port']
     sc=SetCores.SetCores()  #Create an instance of SetCores
     sc.password=server_conf['password']
-    srco=setSoftResourceConfiguration.setSoftResourceConfiguration()  #Create an instance of setSoftResourceConfiguration
+    srco=SetSoftResourceConfiguration.SetSoftResourceConfiguration()  #Create an instance of SetSoftResourceConfiguration
     srco.password=server_conf['password']
     profiler_obj=profiler.profiler()  #Create an instance of Profiler
     ipbo=ThreadPoolClassification.ThreadPoolClassification()
