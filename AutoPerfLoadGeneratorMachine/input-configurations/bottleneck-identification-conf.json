@@ -1,0 +1,44 @@
+{
+    "coresDetails":
+    {
+        "noOfCores":4,
+        "SoftResourceBottleneckThreshold":1.2
+    },
+    "baselineResourceConfigurationDetails":{
+        "userReplicas":{
+            "name":"userReplicas",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*user[\\s\\S]*?replicas:\\s*)(\\d+)",
+            "value":1,
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        }
+    },
+    "softwareResourceConfigurationDetails":
+    {
+        "userReplicas":
+        {
+            "name":"userReplicas",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*user[\\s\\S]*?replicas:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":1,
+                "maxValue":2,
+                "step":1
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        }
+    },
+    "sessionDetails":{
+        "filePath":"/home/helen/Desktop/sockShop/sockshop1.jmx",
+        "thinkTime":0
+    },
+    "loadGeneratorDetails":{
+        "name":"jmeter"
+    },
+    "processToProfileDetails":{
+        "names":["node","java","mongod","redis-server"]
+    }
+}
