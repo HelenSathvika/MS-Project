@@ -1,0 +1,21 @@
+{
+    "coresDetails":
+    {
+        "noOfCores":32
+    },
+    "processToProfileDetails":
+    {
+        "process_id":[1927491,2023280,2023279,1924724,1924240],
+        "process_name":["nginx","gunicorn","celery","redis-server","postgres"]
+    },
+    "testDuration":120,
+    "loadGeneratorDetails":
+    {
+        "name":"jmeter"
+    },
+    "sessionDetails":
+    {
+        "filePath":"/home/helen/Desktop/Evalpro/EvalPro_Login_1.jmx"
+    },
+    "loadLevel":300
+}
