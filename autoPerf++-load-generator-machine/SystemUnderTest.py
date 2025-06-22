@@ -33,7 +33,7 @@ class SystemUnderTest:
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(self.ip_adress,username=self.username,password=self.password) #Connect to the server machine using SSH protocol
         dict_arg = json.dumps(self.server_conf['serverDetails'])
-        command = f"python3 {self.path}run.py '{dict_arg}' &"
+        command = f"python3 {self.path}Run.py '{dict_arg}' &"
         stdin,stdout,stderr=ssh.exec_command(command) #Execute the command to start the Server Side Agent Script
         channel=stdout.channel
         while not channel.exit_status_ready(): #If not able to exceute the coomand return
