@@ -88,15 +88,15 @@ class ProfilingAgentMaster:
         self.socket_connect_info.send((json.dumps(["perfProfiling","stop"])+'\n').encode('utf-8'))
         self.socket_connect_info.recv(1024).decode('utf-8')
 
-    def identifyPotentialProcessBottlenecks(self,test_duration,event): #Intruct server side agent to start capturing threads trace
-        self.socket_connect_info.send((json.dumps(["identifyPotentialProcessBottlenecks",event,self.process_names,test_duration])+'\n').encode('utf-8'))
+    def threadPoolClassification(self,test_duration,event): #Intruct server side agent to start capturing threads trace
+        self.socket_connect_info.send((json.dumps(["threadPoolClassification",event,self.process_names,test_duration])+'\n').encode('utf-8'))
         data=self.socket_connect_info.recv(1024).decode('utf-8')
         #self.socket_connect_info.setblocking(True)
         data=self.socket_connect_info.recv(1024).decode('utf-8')
         self.socket_connect_info.send("Recieved data".encode('utf-8'))
 
-    def similarityCheck(self): #Collect similarity scores of thread pool
-        self.socket_connect_info.send((json.dumps(["similarityCheck"])+'\n').encode('utf-8'))
+    def similarityScore(self): #Collect similarity scores of thread pool
+        self.socket_connect_info.send((json.dumps(["similarityScore"])+'\n').encode('utf-8'))
         self.socket_connect_info.recv(1024).decode('utf-8')
         self.socket_connect_info.setblocking(True)
         data=''
