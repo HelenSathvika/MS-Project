@@ -1,0 +1,34 @@
+{
+    "coresDetails":{
+        "cores":[1,32],
+        "LLCInflationFactor":2.5
+    },
+    "baselineResourceConfigurationDetails":{
+        "gunicornWorkers":{
+            "name":"gunicornWorkers",
+            "filePath":"/home/perf/bodhi_perf/wsgi/entrypoint.sh",
+            "reqExp":"(workers\\s+\")(\\d+)",
+            "value":10,
+            "commands":"cd /home/perf/bodhi_perf/wsgi;docker build . -t wsgi:bodhitree3;docker service update bodhi_perf_wsgi --force",
+            "timeWait":5
+        },
+        "celeryThreads":{
+            "name":"celeryThreads",
+            "filePath":"/home/perf/bodhi_perf/wsgi/entrypoint.sh",
+            "reqExp":"(concurrency\\=)(\\d+)",
+            "value":2,
+            "commands":"cd /home/perf/bodhi_perf/wsgi;docker build . -t wsgi:bodhitree3;docker service update bodhi_perf_wsgi --force",
+            "timeWait":5
+        }
+    },
+    "sessionDetails":{
+        "filePath":"/home/helen/Desktop/Evalpro/Evalpro.jmx",
+        "thinkTime":5
+    },
+    "loadGeneratorDetails":{
+        "name":"jmeter"
+    },
+    "processToProfileDetails":{
+        "names":["nginx","gunicorn","celery","redis-server","postgres"]
+    } 
+}
