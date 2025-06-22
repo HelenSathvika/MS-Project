@@ -44,7 +44,7 @@ bzt example_test.yml
 git clone https://github.com/HelenSathvika/MS-Project.git
 ```
 
-Extract only the `autoPerf++-load-generator-machine` folder to your working directory.
+Extract only the `AutoPerf++-oad-generator-machine` folder to your working directory.
 
 #### Step 4: Navigate to the Load Generator Directory
 
