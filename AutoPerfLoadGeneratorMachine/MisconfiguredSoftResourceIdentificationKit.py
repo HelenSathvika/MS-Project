@@ -53,7 +53,8 @@ class MisconfiguredSoftResourceIdentificationKit:
 
         for resource_name in initial_resource_configuration_details:
             server_configuration_master_obj.setSoftwareResource(initial_resource_configuration_details[resource_name],self.socket_connect_info)
-
+        
+        #Perform capacity analysis at baseline configuration and capture maximum throughput
         autoperf_obj=CapacityAnalysis.CapacityAnalysis()
         autoperf_obj.initialize(user_session['thinkTime'],cores_details['noOfCores'],self.load_generator_master_obj,profiling_agent_master_obj)
         baseline_throughput=autoperf_obj.automatedLoadTesting()
@@ -77,7 +78,7 @@ class MisconfiguredSoftResourceIdentificationKit:
 
                 server_configuration_master_obj.setSoftwareResource(resource_details,self.socket_connect_info)
 
-                throughput=autoperf_obj.automatedLoadTesting() #Capture Maximum throughput
+                throughput=autoperf_obj.automatedLoadTesting() #Capture Maximum throughput at each resource configuration
                 throughput_list.append(throughput)
                 resource_value_list.append(resource_value)
 
