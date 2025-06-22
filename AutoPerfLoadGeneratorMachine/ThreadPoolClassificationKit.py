@@ -24,7 +24,7 @@ class ThreadPoolClassificationKit:
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.load_test_folder = "potential_bottleneck_output"+"/"+"loadTesting_"+timestamp #Create a unique name folder to store the ouput graphs of this run
         os.makedirs(self.load_test_folder)
-        potential_bottlencks_configurations="input-configurations/potential-process-bottlenecks-conf.json" #Read Thread Pool Classification Input File
+        potential_bottlencks_configurations="input-configurations/thread-pool-classification-conf.json" #Read Thread Pool Classification Input File
         with open(potential_bottlencks_configurations,'rb') as file:
             potential_bottlencks_conf_content=file.read()
         potential_bottlencks_conf_json_content=potential_bottlencks_conf_content.decode('utf-8')
