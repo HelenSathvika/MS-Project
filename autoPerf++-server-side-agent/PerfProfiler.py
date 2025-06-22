@@ -7,7 +7,7 @@ import concurrent.futures
 import os
 import json
 
-class perfProfiler:
+class PerfProfiler:
 
     process_names=[]
     process_perf_resource_usage={}
