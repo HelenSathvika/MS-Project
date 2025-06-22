@@ -57,7 +57,7 @@ class LLCBottleneckDetectionKit:
 
         for cores in cores_details['cores']: #For each core level
             server_configuration_master_obj.setCores(cores,self.socket_connect_info)
-            autoperf_obj=AutoPerf.AutoPerf()
+            autoperf_obj=CapacityAnalysis.CapacityAnalysis()
             autoperf_obj.initialize(user_session['thinkTime'],cores,self.load_generator_master_obj,profiling_agent_master_obj)
             test_start_time=time.time()
             throughput=autoperf_obj.automatedLoadTesting() #Capture maximum throughput and resource usage
