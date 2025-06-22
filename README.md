@@ -60,7 +60,7 @@ pip3 install -r requirements.txt
 
 #### Step 6: Configure Inputs
 
-Modify the input configuration file in the `input-configuration/` folder according to the mode you want to run.
+Modify the input configuration file in the `input-configurations/` folder according to the mode you want to run.
 
 #### Step 7: Run AutoPerf++
 
@@ -107,10 +107,10 @@ MS-Project/
 ├── autoPerf++-load-generator-machine/
 │   ├── main.py
 │   ├── requirements.txt
-│   ├── input-configuration/
+│   ├── input-configurations/
 │   └── ...
 └── autoPerf++-server-side-agent/
-    ├── agent.py
+    ├── Run.py
     ├── requirements.txt
     └── ...
 ```
