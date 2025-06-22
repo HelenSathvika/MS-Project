@@ -1,6 +1,6 @@
 import json
 import time
-import connectionSetup
+import ConnectionSetup
 import SetSoftResourceConfiguration
 import SetCores
 import profiler
@@ -9,7 +9,7 @@ import perfProfiler
 class main:
     server_conf_json = sys.argv[1] 
     server_conf = json.loads(server_conf_json)
-    connection_setup=connectionSetup.connectionSetup() #Create an instance of connectionSetUp
+    connection_setup=ConnectionSetup.ConnectionSetup() #Create an instance of ConnectionSetup
     connection_setup.IPAdress=server_conf['IPAdress']
     connection_setup.port=server_conf['port']
     sc=SetCores.SetCores()  #Create an instance of SetCores
