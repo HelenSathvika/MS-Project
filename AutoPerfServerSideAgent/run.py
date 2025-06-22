@@ -2,7 +2,7 @@ import json
 import time
 import connectionSetup
 import setSoftResourceConfiguration
-import setCores
+import SetCores
 import profiler
 import ThreadPoolClassification
 import perfProfiler
@@ -12,7 +12,7 @@ class main:
     connection_setup=connectionSetup.connectionSetup() #Create an instance of connectionSetUp
     connection_setup.IPAdress=server_conf['IPAdress']
     connection_setup.port=server_conf['port']
-    sc=setCores.setCores()  #Create an instance of setCores
+    sc=SetCores.SetCores()  #Create an instance of SetCores
     sc.password=server_conf['password']
     srco=setSoftResourceConfiguration.setSoftResourceConfiguration()  #Create an instance of setSoftResourceConfiguration
     srco.password=server_conf['password']
@@ -63,7 +63,7 @@ class main:
                     perf_profiler_obj.start(connection_setup.data[2])
                 elif connection_setup.data[1]=="stop": #Stop Perf profiling
                     perf_profiler_obj.stop()
-            if connection_setup.data[0]=="setCores": #Set Cores
+            if connection_setup.data[0]=="SetCores": #Set Cores
                 sc.data[0]=connection_setup.data[1]
                 sc.setValue()
                 connection_setup.c.send("Rescource value set".encode('utf-8'))
