@@ -3,7 +3,7 @@ import time
 import ConnectionSetup
 import SetSoftResourceConfiguration
 import SetCores
-import profiler
+import Profiler
 import ThreadPoolClassification
 import perfProfiler
 class main:
@@ -16,7 +16,7 @@ class main:
     sc.password=server_conf['password']
     srco=SetSoftResourceConfiguration.SetSoftResourceConfiguration()  #Create an instance of SetSoftResourceConfiguration
     srco.password=server_conf['password']
-    profiler_obj=profiler.profiler()  #Create an instance of Profiler
+    profiler_obj=Profiler.Profiler()  #Create an instance of Profiler
     ipbo=ThreadPoolClassification.ThreadPoolClassification()
     perf_profiler_obj=perfprofiler.perfprofiler() #Create an instance of Perf Profiler
     perf_profiler_obj.password=server_conf['password']
