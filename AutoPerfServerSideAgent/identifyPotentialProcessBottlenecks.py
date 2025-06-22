@@ -18,8 +18,8 @@ class identifyPotentialProcessBottlenecks:
     load_test_folder=""
     input_conf={}
     test_duration=0
-    pids_workers={}
-    pids_threads={}
+    pids_workers={} #Store child worker PIDs of each process
+    pids_threads={} #Store thread TDs of each process
 
     def start(self,event,process_names,test_duration):
         self.process_names=process_names
@@ -36,13 +36,13 @@ class identifyPotentialProcessBottlenecks:
 
         self.captureData(event)
 
-    def getthreads(self,pid):
+    def getthreads(self,pid): #Get thread id's of parent process id
 
         if pid in self.pids_threads:
             return self.pids_threads[pid]
 
         try:
-            process = psutil.Process(pid)
+            process = psutil.Process(pid) #Using psutil library capture thread id's
             threads = process.threads()
             thread_ids = [thread.id for thread in threads]
             self.pids_threads[pid]=thread_ids
@@ -56,12 +56,12 @@ class identifyPotentialProcessBottlenecks:
             self.pids_threads[pid]=[]
             return []
 
-    def getWorkerProcesses(self, pid):
+    def getWorkerProcesses(self, pid): #Get worker process id's of parent process id
 
         if pid in self.pids_workers:
             return self.pids_workers[pid]
         try:
-            command = f"ps --ppid {pid} -o pid --no-headers"
+            command = f"ps --ppid {pid} -o pid --no-headers" #
             worker_pids = subprocess.check_output(command, shell=True).decode().split()
             worker_pids = [int(pid.strip()) for pid in worker_pids if pid.strip().isdigit()]
             self.pids_workers[pid]=worker_pids
@@ -72,15 +72,18 @@ class identifyPotentialProcessBottlenecks:
             self.pids_workers[pid]=worker_pids
             return worker_pids
     
+    #Capture strace output for a single process/thread
     def captureStrace(self,pid,temp_load_test_folder):
 
         if not os.path.exists(f"/proc/{pid}"):
             print(f"Process with PID {pid} does not exist.")
             return
 
+        #Store Strace output for each pid in different file
         output_file = os.path.join(temp_load_test_folder, f"{pid}.strace")
         print(f"Capturing strace for PID {pid} for {self.test_duration} seconds...")
 
+        #Run strace with sudo and a timeout(test duration)
         command = f"echo {self.input_conf["system_password"]} | sudo -S timeout {self.test_duration} strace -p {pid} -o {output_file}"
     
         try:
@@ -93,24 +96,28 @@ class identifyPotentialProcessBottlenecks:
         except Exception as e:
             print(f"Unexpected error for PID {pid}: {e}")
 
-    def captureData(self,event):
+    # Captures straces for all processes (threads+worker processes)
+    def captureData(self,event): #Capture data
         temp_load_test_folder=self.load_test_folder
         temp_load_test_folder=temp_load_test_folder+"/"+event
         os.makedirs(temp_load_test_folder, exist_ok=True)
 
         all_pids = set()
-        for pid in self.process_names:
+        for pid in self.process_names: #Collect worker process ids and thread ids of the parent id
             all_pids.add(pid)
             all_pids.update(self.getWorkerProcesses(pid))
             all_pids.update(self.getthreads(pid))
 
+        #Prepare arguments to capture straces for all pids in parallel
         args=[(pid,temp_load_test_folder) for pid in all_pids]
 
-        capture_strace_func = functools.partial(self.captureStrace)
+        #Multiprocessing to capture strace in parallel
+        capture_strace_func = functools.partial(self.captureStrace) #Start capturing strace for each thread
 
-        with Pool(len(args)) as pool:
+        with Pool(len(args)) as pool: 
             pool.starmap(capture_strace_func, args)
-
+    
+    #Chunk text into overlapping segments
     def chunk_text(self, text, chunk_size=500, overlap=100):
         words = text.split()
         chunks = []
@@ -120,6 +127,7 @@ class identifyPotentialProcessBottlenecks:
             i += chunk_size - overlap  
         return chunks
 
+    # Sfely read a log file
     def read_log_file(self, filename):
         try:
             with open(filename, 'r', encoding='utf-8') as file:
@@ -128,6 +136,7 @@ class identifyPotentialProcessBottlenecks:
             print(f"Error reading file {filename}: {e}")
             return ""
 
+    #Compare two strace logs of process (load vs. no-load)
     def similarityCheck(self, process_id):
         load_folder = os.path.join(self.load_test_folder, "Load")
         noload_folder = os.path.join(self.load_test_folder, "noLoad")
@@ -155,7 +164,8 @@ class identifyPotentialProcessBottlenecks:
         all_chunks = chunks_A + chunks_B
         vectorizer = TfidfVectorizer()
         vectors = vectorizer.fit_transform(all_chunks)
-
+ 
+        #Compare chunks using cosine similarity 
         num_chunks = min(len(chunks_A), len(chunks_B))
         similarities = []
 
@@ -167,6 +177,7 @@ class identifyPotentialProcessBottlenecks:
 
         return sum(similarities) / len(similarities) if similarities else 0.0
 
+    #Run similarity analysis for all parent ids
     def calculateProcessSimilarity(self):
         process_similarities = {}
         load_folder = os.path.join(self.load_test_folder, "Load")
@@ -181,12 +192,12 @@ class identifyPotentialProcessBottlenecks:
                 noload_log_file = os.path.join(noload_folder, f"{process_id}.strace")
 
                 if os.path.exists(load_log_file) and os.path.exists(noload_log_file):
-                    similarity = self.similarityCheck(process_id)
+                    similarity = self.similarityCheck(process_id) #Capture similatiry score for each thread id or worker process id
                     similarities.append(similarity)
 
-            if similarities:
+            if similarities: #Average the similairity as one process thread pool
                 process_similarities[pid] = sum(similarities) / len(similarities)
             else:
                 print(f"No similarity data available for process {pid} and its workers.")
 
-        return process_similarities
+        return process_similarities #Return similarity
