@@ -4,7 +4,7 @@ import connectionSetup
 import setSoftResourceConfiguration
 import setCores
 import profiler
-import identifyPotentialProcessBottlenecks
+import ThreadPoolClassification
 import perfProfiler
 class main:
     server_conf_json = sys.argv[1] 
@@ -17,17 +17,17 @@ class main:
     srco=setSoftResourceConfiguration.setSoftResourceConfiguration()  #Create an instance of setSoftResourceConfiguration
     srco.password=server_conf['password']
     profiler_obj=profiler.profiler()  #Create an instance of Profiler
-    ipbo=identifyPotentialProcessBottlenecks.identifyPotentialProcessBottlenecks()
+    ipbo=ThreadPoolClassification.ThreadPoolClassification()
     perf_profiler_obj=perfprofiler.perfprofiler() #Create an instance of Perf Profiler
     perf_profiler_obj.password=server_conf['password']
     while connection_setup.condition:
         signalSet=connection_setup.receiveData()
         if signalSet:
-            if connection_setup.data[0]=="identifyPotentialProcessBottlenecks":
+            if connection_setup.data[0]=="threadPoolClassification": #Start thread pool classification
                 ipbo.start(connection_setup.data[1],connection_setup.data[2],connection_setup.data[3])
                 connection_setup.c.send("Completed".encode('utf-8'))
                 connection_setup.c.recv(1024).decode('utf-8')
-            if connection_setup.data[0]=="similarityCheck":
+            if connection_setup.data[0]=="similarityScore": #Get similarity score
                 data=ipbo.calculateProcessSimilarity()
                 connection_setup.c.send((json.dumps(data)+'\n').encode('utf-8'))
                 connection_setup.c.recv(1024).decode('utf-8')
