@@ -12,7 +12,7 @@ import functools
 import threading
 import psutil
 
-class identifyPotentialProcessBottlenecks:
+class ThreadPoolClassification:
 
     process_names=[]
     load_test_folder=""
@@ -36,7 +36,7 @@ class identifyPotentialProcessBottlenecks:
 
         self.captureData(event)
 
-    def getthreads(self,pid): #Get thread id's of parent process id
+    def getThreads(self,pid): #Get thread id's of parent process id
 
         if pid in self.pids_threads:
             return self.pids_threads[pid]
@@ -106,7 +106,7 @@ class identifyPotentialProcessBottlenecks:
         for pid in self.process_names: #Collect worker process ids and thread ids of the parent id
             all_pids.add(pid)
             all_pids.update(self.getWorkerProcesses(pid))
-            all_pids.update(self.getthreads(pid))
+            all_pids.update(self.getThreads(pid))
 
         #Prepare arguments to capture straces for all pids in parallel
         args=[(pid,temp_load_test_folder) for pid in all_pids]
@@ -118,7 +118,7 @@ class identifyPotentialProcessBottlenecks:
             pool.starmap(capture_strace_func, args)
     
     #Chunk text into overlapping segments
-    def chunk_text(self, text, chunk_size=500, overlap=100):
+    def chunkText(self, text, chunk_size=500, overlap=100):
         words = text.split()
         chunks = []
         i = 0
@@ -128,7 +128,7 @@ class identifyPotentialProcessBottlenecks:
         return chunks
 
     # Sfely read a log file
-    def read_log_file(self, filename):
+    def readLogFile(self, filename):
         try:
             with open(filename, 'r', encoding='utf-8') as file:
                 return file.read()
@@ -147,15 +147,15 @@ class identifyPotentialProcessBottlenecks:
             print(f"Missing strace file for process {process_id}")
             return 0.0 
 
-        A = self.read_log_file(load_file_path)
-        B = self.read_log_file(noload_file_path)
+        A = self.readLogFile(load_file_path)
+        B = self.readLogFile(noload_file_path)
 
         if not A.strip() or not B.strip():
             print(f"Empty log file detected for process {process_id}")
             return 0.0  
 
-        chunks_A = self.chunk_text(A)
-        chunks_B = self.chunk_text(B)
+        chunks_A = self.chunkText(A)
+        chunks_B = self.chunkText(B)
         
         if not chunks_A or not chunks_B:
             print(f"Insufficient data for TF-IDF for process {process_id}")
