@@ -3,7 +3,7 @@ import re
 import time
 import os
 
-class setSoftResourceConfiguration:
+class SetSoftResourceConfiguration:
     data=["path","regExp","value","command","sleep_time"]
     getData=[]
     password=""
