@@ -1,1 +1,4 @@
-
+psutil
+paramiko
+matplotlib
+pandas
