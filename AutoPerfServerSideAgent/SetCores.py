@@ -1,7 +1,7 @@
 import os
 import psutil
 
-class setCores:
+class SetCores:
     data=["value"]
     total_cores = os.cpu_count()
     onlineCPUs=len(psutil.Process(os.getpid()).cpu_affinity())
