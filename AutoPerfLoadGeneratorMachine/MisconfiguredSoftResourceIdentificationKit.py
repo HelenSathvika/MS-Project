@@ -82,14 +82,16 @@ class MisconfiguredSoftResourceIdentificationKit:
                 throughput_list.append(throughput)
                 resource_value_list.append(resource_value)
 
-                max_throughput=max(throughput,max_throughput)
+                if throughput>max_throughput:
+                    max_throughput=throughput
+                    resource_parameter_value=resource_value
                 
             print(max_throughput)
             self.plotBottleneckGraph(resource_value_list,throughput_list,resource_name,resource_name)
             
             if(max_throughput>baseline_throughput*cores_details['SoftResourceBottleneckThreshold']): #If maximum throughput has increased more than the baseline configuration
                 print(max_throughput)
-                print(resource_name+" is the bottleneck")
+                print(resource_name+" is the bottleneck with value"+resource_parameter_value)
                 return
 
         print("Mentioned soft resources are not the bottleneck")
