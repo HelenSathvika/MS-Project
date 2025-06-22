@@ -6,7 +6,7 @@ import re
 import concurrent.futures
 import os
 
-class profiler:
+class Profiler:
 
     process_names=[]
     process_resource_usage={}
