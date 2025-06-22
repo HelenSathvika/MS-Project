@@ -5,7 +5,7 @@ import SetSoftResourceConfiguration
 import SetCores
 import Profiler
 import ThreadPoolClassification
-import perfProfiler
+import PerfProfiler
 class main:
     server_conf_json = sys.argv[1] 
     server_conf = json.loads(server_conf_json)
@@ -18,7 +18,7 @@ class main:
     srco.password=server_conf['password']
     profiler_obj=Profiler.Profiler()  #Create an instance of Profiler
     ipbo=ThreadPoolClassification.ThreadPoolClassification()
-    perf_profiler_obj=perfprofiler.perfprofiler() #Create an instance of Perf Profiler
+    perf_profiler_obj=PerfProfiler.PerfProfiler() #Create an instance of Perf Profiler
     perf_profiler_obj.password=server_conf['password']
     while connection_setup.condition:
         signalSet=connection_setup.receiveData()
