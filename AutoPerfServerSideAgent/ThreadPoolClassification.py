@@ -137,7 +137,7 @@ class ThreadPoolClassification:
             return ""
 
     #Compare two strace logs of process (load vs. no-load)
-    def similarityCheck(self, process_id):
+    def similarityScore(self, process_id):
         load_folder = os.path.join(self.load_test_folder, "Load")
         noload_folder = os.path.join(self.load_test_folder, "noLoad")
         load_file_path = os.path.join(load_folder, f"{process_id}.strace")
@@ -192,7 +192,7 @@ class ThreadPoolClassification:
                 noload_log_file = os.path.join(noload_folder, f"{process_id}.strace")
 
                 if os.path.exists(load_log_file) and os.path.exists(noload_log_file):
-                    similarity = self.similarityCheck(process_id) #Capture similatiry score for each thread id or worker process id
+                    similarity = self.similarityScore(process_id) #Capture similatiry score for each thread id or worker process id
                     similarities.append(similarity)
 
             if similarities: #Average the similairity as one process thread pool
