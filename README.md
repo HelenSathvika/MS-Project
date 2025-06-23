@@ -44,8 +44,6 @@ bzt example_test.yml
 git clone https://github.com/HelenSathvika/MS-Project.git
 ```
 
-Extract only the `AutoPerf++-load-generator-machine` folder to your working directory.
-
 #### Step 4: Navigate to the Load Generator Directory
 
 ```bash
@@ -83,8 +81,6 @@ Replace `<mode_number>` with one of the following:
 ```bash
 git clone https://github.com/HelenSathvika/MS-Project.git
 ```
-
-Extract only the `autoPerf++-server-side-agent` folder to your desired directory.
 
 #### Step 2: Navigate to the Agent Directory
 
