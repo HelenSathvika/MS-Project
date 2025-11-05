@@ -1,0 +1,10 @@
+execution:
+ - executor: jmeter
+   scenario: example
+   concurrency: 300
+   hold-for: 360
+scenarios:
+  example:
+    default-address: http://blazedemo.com
+    script: /home/helen/Desktop/Evalpro/EvalPro_Login_1.jmx
+

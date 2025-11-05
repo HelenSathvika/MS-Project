@@ -1,9 +1,9 @@
 {
     "serverDetails":{
         "IPAdress":"10.129.131.2",
-		    "port":8982,
-		    "username":"perf",
-		    "password":"perf123",
-        "path":"/home/perf/autoperfsbserver/"
+		"port":8982,
+		"username":"perf",
+		"password":"perf123",
+        "path":"/home/perf/autoperfsbserver/run.py"
     }
 }

@@ -23,9 +23,9 @@ class LGMaster:
     profiling_agent_obj=""
     mode=""
 
-    def initialize(self,lg,session_description,profiling_agent_obj,mode): #Initialize
+    def initialize(self,lg,session_description,profiling_agent_obj,mode):
 
-        #modify the lg and user session description paramters in Taurus session description file 
+        #modify the lg and session description
         
         with open('TaurusSessionDescriptionFile.yaml','r+') as file:
             taurus_session_description_file_content=file.read()
@@ -37,7 +37,7 @@ class LGMaster:
         self.profiling_agent_obj=profiling_agent_obj
         self.mode=mode
 
-    def runOneLoadLevel(self,load_level): #Start load testing at specified load level
+    def runOneLoadLevel(self,load_level):
         
 
         time.sleep(120)
@@ -49,7 +49,7 @@ class LGMaster:
         self.taurus_log_folder_path=""
         self.flag_calulate_number_of_requests=True
 
-        #Change load level in Taurus session description file
+        #Change load level
         with open('TaurusSessionDescriptionFile.yaml','r') as file:
             file_content=file.read()
             file_content=re.sub(r'(concurrency:\s+)[0-9]+(.*)',rf'\g<1>{load_level}\g<2>',file_content)
@@ -60,9 +60,7 @@ class LGMaster:
         #start Taurus
         process=subprocess.Popen("bzt TaurusSessionDescriptionFile.yaml",shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
 
-        #Start profiling
         self.profiling_agent_obj.startProfilingAgentAtServer()
-        #If AutoPerf++ runs in LLC bottleneck detection mode start profiling to capture cache misses output
         if self.mode=="perfProfiling":
             self.profiling_agent_obj.startPerfProfilingAtServer()
 
@@ -72,13 +70,12 @@ class LGMaster:
 
         #throughput convergence
         while flag:
-            for line in process.stdout: #For every succesful request or new output line in stdout 
-                if not load_test_start_time: #Capture starting time of the load test
+            for line in process.stdout:
+                if not load_test_start_time:
                     load_test_start_time_match=re.search(r"(\d{2}:\d{2}:\d{2}) INFO: Current",line.strip())
                 if load_test_start_time_match:
                     load_test_start_time=datetime.strptime(load_test_start_time_match.group(1),'%H:%M:%S')
                 
-                #Regular expression to capture the succesful requests, failure requests, response time, time stamp and taurus output file name
                 time_stamp_match=re.search(r"(\d{2}:\d{2}:\d{2})",line.strip())
                 success_match=re.search(r"(\d+) succ",line.strip())
                 failure_match=re.search(r"(\d+) fail",line.strip())
@@ -89,12 +86,12 @@ class LGMaster:
                         self.taurus_log_folder_path=taurus_log_folder_match.group(1)
                         self.taurus_log_folder_path=self.taurus_log_folder_path+"/kpi.jtl"
 
-                if time_stamp_match and success_match: #if there is any successful request
+                if time_stamp_match and success_match:
                     time_stamp=datetime.strptime(time_stamp_match.group(1),'%H:%M:%S')
                     total_latency=0
                     no_of_requests_completed=0
                     time_stamp0=0
-                    with open(self.taurus_log_folder_path,"r") as file: #Read taurus output file /kpi.jtl and calculate the number of sucessful requests
+                    with open(self.taurus_log_folder_path,"r") as file:
                         next(file)
                         for line in file:
                             data=line.split(',')
@@ -105,16 +102,16 @@ class LGMaster:
                                 if(time_stamp0==0):
                                     time_stamp0=int(data[0])
                                 time_stamp1=int(data[0])
-                    self.no_of_requests_completed=no_of_requests_completed #Calcuate number of successful requests
-                    self.number_of_failure_requests=self.number_of_failure_requests+int(failure_match.group(1)) ##Calcuate number of failure requests
-                    responsetime=float(responsetime_match.group(1)) #calculate cummulative response time
+                    self.no_of_requests_completed=no_of_requests_completed
+                    self.number_of_failure_requests=self.number_of_failure_requests+int(failure_match.group(1))
+                    responsetime=float(responsetime_match.group(1))
                     if (time_stamp-load_test_start_time).total_seconds() == 0:
                         self.throughput_list.append(0)
                         self.failure_rate_list.append(0)
                         self.responsetime_list.append((total_latency/self.no_of_requests_completed)*0.001)
                         self.time_stamp_list.append(0)    
                     else:
-                        throughput=self.no_of_requests_completed/((time_stamp1-time_stamp0)*0.001) #calcualte cummulative throughput
+                        throughput=self.no_of_requests_completed/((time_stamp1-time_stamp0)*0.001)
                         failure_rate=self.number_of_failure_requests/(time_stamp-load_test_start_time).total_seconds()
                         self.throughput_list.append(throughput)
                         self.failure_rate_list.append(failure_rate)
@@ -125,7 +122,7 @@ class LGMaster:
                         continue
                     if (self.throughput_list[-2]==0):
                         continue
-                    if (abs(self.throughput_list[-1]-self.throughput_list[-2])/self.throughput_list[-2]) <= 0.1: #Cummulative Throughput convergence
+                    if (abs(self.throughput_list[-1]-self.throughput_list[-2])/self.throughput_list[-2]) <= 0.1:
                         count=count-1
                         if count==0:
                             flag=False
@@ -133,12 +130,9 @@ class LGMaster:
                     else:
                         count=5
 
-        #Stop profiling
         self.profiling_agent_obj.stopProfilingAgentAtServer()
-        #Start Profiling and get CPU Time for service demand convergence
         self.profiling_agent_obj.startGettingCPUTime()
 
-        #Start a seperate thread to capture the number of successful requests
         threading.Thread(target=self.calculateNoOfRequests,args=(process.stdout,load_test_start_time,)).start()
 
         temp_completed_requests=self.no_of_requests_completed
@@ -148,24 +142,25 @@ class LGMaster:
         temp_cpu_time=[0]*len(self.profiling_agent_obj.process_names)
         count=[5]*len(self.profiling_agent_obj.process_names)
 
-        while True: #For every 4 secs
-            time.sleep(2) #Sleep for 2 secs to start CPU service demand convergence
+        while True:
+            time.sleep(2)
             temp_completed_requests1=temp_completed_requests1+self.no_of_requests_completed
-            [cpu_time_list,cpu_percentage]=self.profiling_agent_obj.getCPUTime() #Get CPU Time and CPU percentage of each proccess
+            [cpu_time_list,cpu_percentage]=self.profiling_agent_obj.getCPUTime()
             temp_completed_requests=temp_completed_requests+self.no_of_requests_completed
             temp=(temp_completed_requests1-temp_completed_requests)/2
-            for i in range(0,len(self.profiling_agent_obj.process_names)): #For each process capture cummulative CPU Time
+            for i in range(0,len(self.profiling_agent_obj.process_names)):
                 temp_cpu_time[i]=temp_cpu_time[i]+cpu_time_list[i]
-            if sum(cpu_percentage)<=0.1: #If overall CPU percentage is less than 0.1
-                self.flag_calulate_number_of_requests=False #Stop collecting number of sucsessful requests
-                for proc in psutil.process_iter(['name']): #Kill Taurus
+            if sum(cpu_percentage)<=0.1:
+                self.flag_calulate_number_of_requests=False
+                for proc in psutil.process_iter(['name']):
                     if proc.info['name']=="bzt":
                         proc.kill()
                     if proc.info['name']=="java":
                         proc.kill()
-                #Capture entire resource usage and return telling that minimum load level is not found
                 application_resource_usage=self.profiling_agent_obj.getApplicationResourceUsage()
+                print(application_resource_usage)
                 process_resource_usage=self.profiling_agent_obj.getprocessResourceUsage()
+                print(process_resource_usage)
                 perf_application_resource_usage={}
                 perf_process_resource_usage={}
                 if self.mode=="perfProfiling":
@@ -180,8 +175,6 @@ class LGMaster:
                 test_elapsed_time=test_end_time-test_start_time
                 observerd_thinktime=(load_level/self.throughput_list[-1])-self.responsetime_list[-1]
                 return (True,self.throughput_list[-1],self.responsetime_list[-1],self.failure_rate_list[-1],observerd_thinktime,temp_process_service_demand,application_resource_usage,process_resource_usage,perf_application_resource_usage,perf_process_resource_usage)
-
-            #CPU Service Demand Convergence
             for i in range(0,len(self.profiling_agent_obj.process_names)):
                 temp_process_service_demand[i]=(temp_cpu_time[i])/(temp_completed_requests1+temp)
             for i in range(0,len(self.profiling_agent_obj.process_names)):
@@ -201,8 +194,7 @@ class LGMaster:
                 proc.kill()
             if proc.info['name']=="java":
                 proc.kill()
-        
-        #Capture entire resource usage and minimum load level is found
+
         application_resource_usage=self.profiling_agent_obj.getApplicationResourceUsage()
         process_resource_usage=self.profiling_agent_obj.getprocessResourceUsage()
         perf_application_resource_usage={}
@@ -218,7 +210,7 @@ class LGMaster:
         time.sleep(100)
         return (False,self.throughput_list[-1],self.responsetime_list[-1],self.failure_rate_list[-1],observerd_thinktime,temp_process_service_demand,application_resource_usage,process_resource_usage,perf_application_resource_usage,perf_process_resource_usage)
 
-    def calculateNoOfRequests(self,process_stdout,load_test_start_time): #Collect number of sucessful requests (same as throughput convergence)
+    def calculateNoOfRequests(self,process_stdout,load_test_start_time):
         time.sleep(1)
         while self.flag_calulate_number_of_requests:
             for line in process_stdout:

@@ -1,0 +1,12 @@
+{
+    "loadGeneratorDetails":
+    {
+        "loadGenerator":"jmeter"
+    },
+    "loadLevels":[1,2],
+    "sessionDetails":
+    {
+        "filePath":"/home/helen/Desktop/Evalpro/Evalpro.jmx"
+    },
+    "testDuration":"2m"
+}

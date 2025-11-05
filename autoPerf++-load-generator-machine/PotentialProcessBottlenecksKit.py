@@ -12,24 +12,24 @@ import multiprocessing
 import re
 import psutil
 
-class ThreadPoolClassificationKit:
+class PotentialProcessBottlenecksKit:
 
     socket_connect_info=None
     load_test_folder=""
     potential_bottlencks_conf={}
 
-    def start(self,socket_connect_info): #Start Thread Pool Classification
+    def start(self,socket_connect_info):
 
         self.socket_connect_info=socket_connect_info
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.load_test_folder = "potential_bottleneck_output"+"/"+"loadTesting_"+timestamp #Create a unique name folder to store the ouput graphs of this run
+        self.load_test_folder = "potential_bottleneck_output"+"/"+"loadTesting_"+timestamp
         os.makedirs(self.load_test_folder)
-        potential_bottlencks_configurations="input-configurations/thread-pool-classification-conf.json" #Read Thread Pool Classification Input File
+        potential_bottlencks_configurations="input-configurations/potential-process-bottlenecks-conf.json"
         with open(potential_bottlencks_configurations,'rb') as file:
             potential_bottlencks_conf_content=file.read()
         potential_bottlencks_conf_json_content=potential_bottlencks_conf_content.decode('utf-8')
         self.potential_bottlencks_conf=json.loads(potential_bottlencks_conf_json_content)
-        self.runTest() #Start the run
+        self.runTest()
     
     def runTest(self):
         processes_details=self.potential_bottlencks_conf['processToProfileDetails']
@@ -37,12 +37,13 @@ class ThreadPoolClassificationKit:
         user_session=self.potential_bottlencks_conf['sessionDetails']
         load_generator_details=self.potential_bottlencks_conf['loadGeneratorDetails']
         load_level=self.potential_bottlencks_conf['loadLevel']
+        similarity_tolerance_factor=self.potential_bottlencks_conf['similarityToleranceFactor']
 
         profiling_agent_master_obj=ProfilingAgentMaster.ProfilingAgentMaster()
         profiling_agent_master_obj.initialize(processes_details["process_id"],self.socket_connect_info)
 
 
-        profiling_agent_master_obj.threadPoolClassification(test_duration,"noLoad") #Start capturing traces of thread pool at no load 
+        profiling_agent_master_obj.identifyPotentialProcessBottlenecks(test_duration,"noLoad")
 
 
         with open('TaurusSessionDescriptionFile.yaml','r+') as file:
@@ -54,27 +55,31 @@ class ThreadPoolClassificationKit:
         with open('TaurusSessionDescriptionFile.yaml','w') as file:
             file.write(taurus_session_description_file_content)
 
-        process=subprocess.Popen("bzt TaurusSessionDescriptionFile.yaml",shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True) #Start load testing
+        process=subprocess.Popen("bzt TaurusSessionDescriptionFile.yaml",shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
 
         time.sleep(test_duration)
 
 
-        profiling_agent_master_obj.threadPoolClassification(test_duration,"Load")  #Start capturing traces of thread pool at load
+        profiling_agent_master_obj.identifyPotentialProcessBottlenecks(test_duration,"Load")
 
 
-        for proc in psutil.process_iter(['name']):
-            if proc.info['name']=="bzt":
-                proc.kill()
-            if proc.info['name']=="java":
-                proc.kill()
+        # for proc in psutil.process_iter(['name']):
+        #     if proc.info['name']=="bzt":
+        #         proc.kill()
+        #     if proc.info['name']=="java":
+        #         proc.kill()
 
         test_start_time=time.time()
-        process_similarity=profiling_agent_master_obj.similarityScore() #Collect similarity score
+        process_similarity=profiling_agent_master_obj.similarityCheck()
         test_end_time=time.time()
         print(process_similarity)
         print(test_end_time-test_start_time)
-        paired = list(zip(processes_details["process_name"], process_similarity)) #Sort the similarity scores in ascending order
-        sorted_pairs = sorted(paired, key=lambda x: x[1])
-        sorted_names, sorted_values = zip(*sorted_pairs)
-        print("Sorted Process Names:", sorted_names)
-        print("Sorted Similarity Scores:", sorted_values)
+        count=0
+        for process, similarity in process_similarity.items():
+            if similarity > similarity_tolerance_factor:
+                print(processes_details["process_name"][count]+" might not be potential bottleneck")
+            count=count+1
+
+
+
+

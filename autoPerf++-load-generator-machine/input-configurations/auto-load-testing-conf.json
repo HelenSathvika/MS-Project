@@ -1,0 +1,15 @@
+{
+    "sessionDetails":{
+        "filePath":"/home/helen/Desktop/Evalpro/Evalpro.jmx",
+        "thinkTime":0
+    },
+    "loadGeneratorDetails":{
+        "name":"jmeter"
+    },
+    "processToProfileDetails":{
+        "names":["nginx","guincorn","celery","redis","postgres","redis"]
+    },
+    "coresDetails":{
+        "activeCores":32
+    }
+}

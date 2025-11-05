@@ -5,14 +5,14 @@ import json
 import LGMaster
 import ProfilingAgentMaster
 import ServerConfigurationMaster
-import CapacityAnalysis
+import AutoPerf
 import time
 import datetime
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
-class LLCBottleneckDetectionKit:
+class HardwareBottleneckIdentificationKit:
 
     scalability_conf={}
     metrics_vs_cores={"Throughput":{},"OverallCPUPercentage":{},"userCPUTime":{},"sysCPUTime":{},"responseTime":{},"failureRate":{},"observedThinkTime":{},"ctxSwitches":{},"virtualMemoryUsedPercentage":{},"diskUsedPercentage":{},"swapMemoryUsedPercentage":{},"calculatedCPUServiceDemand":{},"observedCPUServiceDemand":{},"LLC-loads":{},"LLC-load-misses":{},"LLC-stores":{},"LLC-store-misses":{},"test-duration":{}}
@@ -23,20 +23,19 @@ class LLCBottleneckDetectionKit:
     load_test_folder=""
     output_file_name=""
 
-    def start(self,socket_connect_info): #Start LLC Bottleneck Detection Mode
+    def start(self,socket_connect_info):
         self.socket_connect_info=socket_connect_info
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.load_test_folder = "memory_bottleneck_output"+"/"+"loadTesting_"+timestamp #Create a unique name folder to store the ouput graphs of this run
+        self.load_test_folder = "memory_bottleneck_output"+"/"+"loadTesting_"+timestamp 
         os.makedirs(self.load_test_folder)
-        scalability_configurations="input-configurations/memory-bottleneck-identification.json" # Read Scalability profiling Configuration File
+        scalability_configurations="input-configurations/memory-bottleneck-identification.json"
         with open(scalability_configurations,'rb') as file:
             scalability_conf_content=file.read()
         scalability_conf_json_content=scalability_conf_content.decode('utf-8')
         self.scalability_conf=json.loads(scalability_conf_json_content)
-        self.runLoadTest() #Start the bottleneck identification of the application
+        self.runLoadTest()
 
     def runLoadTest(self):
-        #Collect all the user input specification details in a variable
         cores_details=self.scalability_conf['coresDetails']
         user_session=self.scalability_conf['sessionDetails']
         load_generator_details=self.scalability_conf['loadGeneratorDetails']
@@ -55,12 +54,12 @@ class LLCBottleneckDetectionKit:
         for resource_name in resource_configuration_details:
             server_configuration_master_obj.setSoftwareResource(resource_configuration_details[resource_name],self.socket_connect_info)
 
-        for cores in cores_details['cores']: #For each core level
+        for cores in cores_details['cores']:
             server_configuration_master_obj.setCores(cores,self.socket_connect_info)
-            autoperf_obj=CapacityAnalysis.CapacityAnalysis()
+            autoperf_obj=AutoPerf.AutoPerf()
             autoperf_obj.initialize(user_session['thinkTime'],cores,self.load_generator_master_obj,profiling_agent_master_obj)
             test_start_time=time.time()
-            throughput=autoperf_obj.automatedLoadTesting() #Capture maximum throughput and resource usage
+            throughput=autoperf_obj.automatedLoadTesting()
             test_end_time=time.time()
             self.maxThroughput_vs_cores[cores]=throughput
             self.metrics_vs_cores["Throughput"][cores]=self.maxThroughput_vs_cores[cores]
@@ -74,7 +73,6 @@ class LLCBottleneckDetectionKit:
             self.metrics_vs_cores["virtualMemoryUsedPercentage"][cores]=autoperf_obj.application_resource_usage["virtualMemoryUsedPercentage"]
             self.metrics_vs_cores["diskUsedPercentage"][cores]=autoperf_obj.application_resource_usage["diskUsedPercentage"]
             self.metrics_vs_cores["swapMemoryUsedPercentage"][cores]=autoperf_obj.application_resource_usage["swapMemoryUsedPercentage"]
-            #Capture LLC Load misses and LLC Store Misses
             self.metrics_vs_cores["LLC-loads"][cores]=autoperf_obj.application_perf_resource_usage["LLC-loads"]
             self.metrics_vs_cores["LLC-load-misses"][cores]=autoperf_obj.application_perf_resource_usage["LLC-load-misses"]
             self.metrics_vs_cores["LLC-stores"][cores]=autoperf_obj.application_perf_resource_usage["LLC-stores"]
@@ -111,21 +109,21 @@ class LLCBottleneckDetectionKit:
 
         self.resourceUsageProfiling(processes_details,cores_details)
 
-    def resourceUsageProfiling(self,processes_details,cores_details): #LLC Bottleneck Detection Inferences
+    def resourceUsageProfiling(self,processes_details,cores_details):
         resource_details_names=["LLC-loads","LLC-load-misses","LLC-stores","LLC-store-misses"]
-        for process_name in processes_details["names"]: #For each process 
+        for process_name in processes_details["names"]:
             for resource in resource_details_names:
                 for cores in cores_details['cores']:
                     if self.processMetrics_vs_cores[process_name][resource][1]!=0 and cores!=1:
                         temp=(self.processMetrics_vs_cores[process_name][resource][cores]/self.processMetrics_vs_cores[process_name][resource][1])
-                        if(temp>(cores*cores_details['LLCInflationFactor'])): #Is there any inlfation 
+                        if(temp>(cores*cores_details['LLCInflationFactor'])):
                             print(resource+" of "+process_name+" doesn't have linear increment with inflation factor"+str(temp))
         
-        for resource in resource_details_names: #For entire application
+        for resource in resource_details_names:
             for cores in cores_details['cores']:
                 if self.metrics_vs_cores[resource][1]!=0 and cores!=1:
                     temp=self.metrics_vs_cores[resource][cores]/self.metrics_vs_cores[resource][1]
-                    if(temp>(cores*cores_details['LLCInflationFactor'])): #Is there any inflation
+                    if(temp>(cores*cores_details['LLCInflationFactor'])):
                         print(resource+" doesn't scale linear with inflation factor"+str(temp))
 
         for cores in cores_details['cores']:
@@ -145,7 +143,7 @@ class LLCBottleneckDetectionKit:
         plt.savefig(file_name)
         plt.close()
 
-    def plotmetricsGraph(self,x_axis,y_axis,plot_title,x_axis_title,y_axis_title): #Plot Graphs
+    def plotmetricsGraph(self,x_axis,y_axis,plot_title,x_axis_title,y_axis_title):
         file_name=self.load_test_folder+"/"+plot_title
         plt.figure(figsize=(8, 5))
         plt.plot(x_axis, y_axis, marker='o', linestyle='-', color='b', label='Values')

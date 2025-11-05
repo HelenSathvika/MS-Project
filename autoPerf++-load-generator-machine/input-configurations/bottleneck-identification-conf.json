@@ -29,6 +29,132 @@
             },
             "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
             "timeWait":5
+        },
+        "userCPURequest":
+        {
+            "name":"userCPURequest",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*user[\\s\\S]*?resources:[\\s\\S]*?requests:[\\s\\S]*?cpu:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":100,
+                "maxValue":300,
+                "step":100
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "ordersReplicas":
+        {
+            "name":"ordersReplicas",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*orders[\\s\\S]*?replicas:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":1,
+                "maxValue":2,
+                "step":1
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "ordersCPURequest":
+        {
+            "name":"ordersCPURequest",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*orders[\\s\\S]*?resources:[\\s\\S]*?requests:[\\s\\S]*?cpu:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":100,
+                "maxValue":300,
+                "step":100
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "frontendReplicas":
+        {
+            "name":"frontendReplicas",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*front-end[\\s\\S]*?replicas:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":1,
+                "maxValue":2,
+                "step":1
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "frontendCPURequest":
+        {
+            "name":"frontendCPURequest",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*front-end[\\s\\S]*?resources:[\\s\\S]*?requests:[\\s\\S]*?cpu:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":100,
+                "maxValue":300,
+                "step":100
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "catalogueReplicas":
+        {
+            "name":"catalogueReplicas",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*catalogue[\\s\\S]*?replicas:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":1,
+                "maxValue":2,
+                "step":1
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "catalogueCPURequest":
+        {
+            "name":"catalogueCPURequest",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*catalogue[\\s\\S]*?resources:[\\s\\S]*?requests:[\\s\\S]*?cpu:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":100,
+                "maxValue":300,
+                "step":100
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "queuemasterReplicas":
+        {
+            "name":"queuemasterReplicas",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*queue-master[\\s\\S]*?replicas:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":1,
+                "maxValue":2,
+                "step":1
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
+        },
+        "queuemasterCPURequest":
+        {
+            "name":"queuemasterCPURequest",
+            "filePath":"/home/panda/microservices-demo/deploy/kubernetes/complete-demo.yaml",
+            "reqExp":"(name:\\s*queue-master[\\s\\S]*?resources:[\\s\\S]*?requests:[\\s\\S]*?cpu:\\s*)(\\d+)",
+            "valueRange":
+            {
+                "minValue":100,
+                "maxValue":300,
+                "step":100
+            },
+            "commands":"cd /home/panda/microservices-demo/deploy/kubernetes;minikube stop;minikube delete;minikube start --cpus=4 --memory=8192;kubectl apply -f complete-demo.yaml;sleep 360;nohup kubectl port-forward svc/front-end -n sock-shop --address 0.0.0.0 8080:80 &",
+            "timeWait":5
         }
     },
     "sessionDetails":{

@@ -5,14 +5,14 @@ import json
 import LGMaster
 import ProfilingAgentMaster
 import ServerConfigurationMaster
-import CapacityAnalysis
+import AutoPerf
 import time
 import datetime
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
-class MisconfiguredSoftResourceIdentificationKit:
+class SoftwareBottleneckIdentificationKit:
 
     socket_connect_info=None
     load_test_folder=""
@@ -20,17 +20,17 @@ class MisconfiguredSoftResourceIdentificationKit:
     load_generator_master_obj=""
     processMetrics_vs_cores={}
 
-    def start(self,socket_connect_info): #Start Misconfogured Soft Resource Identification Mode
+    def start(self,socket_connect_info):
         self.socket_connect_info=socket_connect_info
         timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        self.load_test_folder = "bottleneck_identifation_output"+"/"+"loadTesting_"+timestamp #Create a unique name folder to store the ouput graphs of this run
+        self.load_test_folder = "bottleneck_identifation_output"+"/"+"loadTesting_"+timestamp 
         os.makedirs(self.load_test_folder)
         bottleneck_configurations="input-configurations/bottleneck-identification-conf.json"
         with open(bottleneck_configurations,'rb') as file:
             bottleneck_conf_content=file.read()
         bottleneck_conf_json_content=bottleneck_conf_content.decode('utf-8')
         self.bottleneck_conf=json.loads(bottleneck_conf_json_content)
-        self.runLoadTest() #Start load test
+        self.runLoadTest()
 
     def runLoadTest(self):
         cores_details=self.bottleneck_conf['coresDetails']
@@ -53,15 +53,14 @@ class MisconfiguredSoftResourceIdentificationKit:
 
         for resource_name in initial_resource_configuration_details:
             server_configuration_master_obj.setSoftwareResource(initial_resource_configuration_details[resource_name],self.socket_connect_info)
-        
-        #Perform capacity analysis at baseline configuration and capture maximum throughput
-        autoperf_obj=CapacityAnalysis.CapacityAnalysis()
+
+        autoperf_obj=AutoPerf.AutoPerf()
         autoperf_obj.initialize(user_session['thinkTime'],cores_details['noOfCores'],self.load_generator_master_obj,profiling_agent_master_obj)
         baseline_throughput=autoperf_obj.automatedLoadTesting()
         print(baseline_throughput)
-        for resource_name in resource_configuration_details: #For each resource parameter
+        for resource_name in resource_configuration_details:
 
-            for i_resource_name in initial_resource_configuration_details: #Change resource configuration value
+            for i_resource_name in initial_resource_configuration_details:
                 server_configuration_master_obj.setSoftwareResource(initial_resource_configuration_details[i_resource_name],self.socket_connect_info)
             max_throughput=0
             throughput_list=[]
@@ -78,25 +77,23 @@ class MisconfiguredSoftResourceIdentificationKit:
 
                 server_configuration_master_obj.setSoftwareResource(resource_details,self.socket_connect_info)
 
-                throughput=autoperf_obj.automatedLoadTesting() #Capture Maximum throughput at each resource configuration
+                throughput=autoperf_obj.automatedLoadTesting()
                 throughput_list.append(throughput)
                 resource_value_list.append(resource_value)
 
-                if throughput>max_throughput:
-                    max_throughput=throughput
-                    resource_parameter_value=resource_value
+                max_throughput=max(throughput,max_throughput)
                 
             print(max_throughput)
             self.plotBottleneckGraph(resource_value_list,throughput_list,resource_name,resource_name)
             
-            if(max_throughput>baseline_throughput*cores_details['SoftResourceBottleneckThreshold']): #If maximum throughput has increased more than the baseline configuration
+            if(max_throughput>baseline_throughput*cores_details['SoftResourceBottleneckThreshold']):
                 print(max_throughput)
-                print(resource_name+" is the bottleneck with value"+resource_parameter_value)
+                print(resource_name+" is the bottleneck")
                 return
 
         print("Mentioned soft resources are not the bottleneck")
 
-    def plotBottleneckGraph(self,x_axis,y_axis,plot_title,y_axis_title): #Plot Graphs
+    def plotBottleneckGraph(self,x_axis,y_axis,plot_title,y_axis_title):
         file_name=self.load_test_folder+"/"+plot_title
         plt.figure(figsize=(8, 5))
         plt.plot(x_axis, y_axis, marker='o', linestyle='-', color='b', label='Values')
@@ -106,3 +103,4 @@ class MisconfiguredSoftResourceIdentificationKit:
         plt.grid(True)
         plt.savefig(file_name)
         plt.close()
+

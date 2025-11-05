@@ -17,5 +17,6 @@
     {
         "filePath":"/home/helen/Desktop/Evalpro/EvalPro_Login_1.jmx"
     },
-    "loadLevel":300
+    "loadLevel":300,
+    "similarityToleranceFactor":0.1
 }
